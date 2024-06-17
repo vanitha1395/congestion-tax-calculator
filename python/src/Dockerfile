@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port the app will run on (change if needed)
-EXPOSE 8000
+EXPOSE 8080
 
 # Set the command to run the app
 CMD ["python", "http_request_handler.py"]

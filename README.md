@@ -13,6 +13,14 @@ This applicaiton is built using python, and provides an HTTP endpoint to calcula
 
 ## How to execute the program
 
+### building docker(inside src folder)
+$ docker build -t congestiontaxapp .
+
+### Check for the docker image created by using
+$ docker images
+
+### Running the application within docker
+$ docker run -p 8080:8080 congestiontaxapp
 
 
 ## Known limitations

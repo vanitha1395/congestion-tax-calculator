@@ -27,9 +27,18 @@ $ docker run -p 8080:8080 congestiontaxapp
 $ curl -X GET -H "Content-Type: application/json" -d '{"city":"Gothenburg","vehicleId":"car","travelDates":["2023-06-11T09:00:00","2023-06-14T18:30:00","2023-06-15T12:00:00","2023-06-23T14:00:00"]}' http://localhost:8080/CalculateCongestionTax
 
 
+## Testing using PostMan
+Have used Postman webclient with desktop application to run tests against the congestion tax calculator application
+
+
 ## Known limitations
 - only available city, gothenburg, can be extended for other cities.
+- Configurations can be kept in database
 
 
 ## Enhancements and Improvements
 - Ability to find vehicle-type from vehicle registration number
+- Invalid input handling (throwing error or negative response when invalid input provided)
+- Handle vehicle and city object creation instances in a better manner
+- Improve response json content
+- Add more API supports apart from congestion tax calculation

@@ -1,0 +1,2 @@
+http_requests == 1.2
+pytest == 8.2.2

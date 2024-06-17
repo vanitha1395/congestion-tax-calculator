@@ -17,9 +17,9 @@ class TaxCalculatorAPIHandler(BaseHTTPRequestHandler):
                 calculator = CongestionCalculator(request_data["city"], request_data["vehicleId"])
 
                 # congestion tax calculation
-                congestion_tax = calculator.get_tax(request_data["travelDates"])
+                congestion_tax = calculator.get_tax_with_date(request_data["travelDates"])
 
-                print(congestion_tax)
+                # print(congestion_tax)
 
                 self.send_response(200)
                 self.send_header("Content-type", "application/json")

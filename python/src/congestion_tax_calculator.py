@@ -1,5 +1,6 @@
 from datetime import datetime, time
 from enum import Enum
+from collections import defaultdict
 
 from models.vehicles.vehicle import Vehicle
 from models.vehicles.car import Car
@@ -10,22 +11,26 @@ from models.vehicles.military_vehicle import MilitaryVehicle
 from models.vehicles.bus import Bus
 from models.vehicles.foreign_vehicle import ForeignVehicle
 
-import json
+from models.cities.city import City
+from models.cities.gothenburg import Gothenburg
 
-toll_free_vehicles = [
-    "emergency vehicle",
-    "bus",
-    "diplomat vehicle",
-    "motorcyles",
-    "military vehicle",
-    "foreign vehicle"
-]
+# configurable parameters imported
+import config
 
 class CongestionCalculator:
     def __init__(self, city, vehicle_type):
-        self.city = city
+        self.city = self.create_city(city.lower())
         self.vehicle = self.create_vehicle(vehicle_type)
 
+    ## Factory method for creating appropriate city object
+    def create_city(self, city_name_str):
+        # dict can be extended with new cities
+        cities = {
+            "gothenburg": Gothenburg
+        }
+        return cities[city_name_str]
+
+    # Factory method for creating respective vehicle object
     def create_vehicle(self, vehicle_type: str) -> Vehicle:
         vehicle_types = {
             "car": Car,
@@ -44,19 +49,9 @@ class CongestionCalculator:
         date_obj = datetime.fromisoformat(date)
         time_obj = date_obj.time()
 
-        tool_fee_schedule = [
-            (time(6, 0), time(6, 29), 8),
-            (time(6, 30), time(6, 59), 13),
-            (time(7, 0), time(7, 59), 18),
-            (time(8, 0), time(8, 29), 13),
-            (time(8, 30), time(14, 59), 8),
-            (time(15, 00), time(15, 29), 13),
-            (time(15, 30), time(16, 59), 18),
-            (time(17, 00), time(17, 59), 13),
-            (time(18, 00), time(18, 29), 8),
-        ]
+        toll_schedule = self.city.get_tool_fee_schedule()
 
-        for start_time, end_time, fee in tool_fee_schedule:
+        for start_time, end_time, fee in toll_schedule:
             if start_time <= time_obj < end_time:
                 return fee
 
@@ -67,7 +62,7 @@ class CongestionCalculator:
         # vehicle name present in toll free vehicle list
         vehicle_type = vehicle.get_vehicle_type()
         vehicle_type = vehicle_type.lower()
-        if vehicle_type in toll_free_vehicles:
+        if vehicle_type in config.toll_free_vehicles:
             return True
 
         # return not toll free vehicle
@@ -91,26 +86,76 @@ class CongestionCalculator:
 
         return False
 
-    def get_tax(self, dates: list):
-        interval_start = dates[0]
-        total_fee = 0
-        for date in dates:
-            travel_date = datetime.fromisoformat(date)
-            interval_date = datetime.fromisoformat(interval_start)
-            next_fee = self.get_toll_fee(date, self.vehicle)
-            temp_fee = self.get_toll_fee(interval_start, self.vehicle)
+    # This func had error in calculating date wise, so its fixed in below function.
+    # def get_tax(self, dates: list):
+    #     interval_start = dates[0]
+    #     total_fee = 0
+    #     for date in dates:
+    #         travel_date = datetime.fromisoformat(date)
+    #         interval_date = datetime.fromisoformat(interval_start)
+    #         next_fee = self.get_toll_fee(date, self.vehicle)
+    #         temp_fee = self.get_toll_fee(interval_start, self.vehicle)
 
-            diff_in_seconds = travel_date.timestamp() - interval_date.timestamp()
-            minutes = diff_in_seconds / 60
+    #         diff_in_seconds = travel_date.timestamp() - interval_date.timestamp()
+    #         minutes = diff_in_seconds / 60
 
-            if minutes <= 60:
-                if total_fee > 0:
-                    total_fee = total_fee - temp_fee
-                if next_fee >= temp_fee:
-                    temp_fee = next_fee
-                total_fee = total_fee + temp_fee
-            else:
-                total_fee = total_fee + next_fee
-        if total_fee > 60:
-            total_fee = 60
-        return total_fee
+    #         if minutes <= 60:
+    #             if total_fee > 0:
+    #                 total_fee = total_fee - temp_fee
+    #             if next_fee >= temp_fee:
+    #                 temp_fee = next_fee
+    #             total_fee = total_fee + temp_fee
+    #         else:
+    #             total_fee = total_fee + next_fee
+    #             interval_start = date
+    #     if total_fee > 60:
+    #         total_fee = 60
+    #     return total_fee
+
+    def get_tax_with_date(self, datetime_str_list: list):
+        # Create a dictionary to store the tax for each date
+        tax_by_date = defaultdict(int)
+        interval_date = datetime_str_list[0]
+
+        # Iterate over the datetime list
+        for dt_str in datetime_str_list:
+
+            # Convert the string to a datetime object
+            dt = datetime.fromisoformat(dt_str)
+            interval_dt = datetime.fromisoformat(interval_date)
+
+            # Get the date from the datetime object
+            date = dt.strftime('%Y-%m-%d')
+
+            # Calculate the toll for the current datetime
+            toll = self.get_toll_fee(dt_str, self.vehicle)
+
+            # Check if there's a previous datetime within one hour
+            previous_dt_str = None
+            for prev_dt_str in datetime_str_list:
+                if prev_dt_str < dt_str:
+                    previous_dt = datetime.fromisoformat(prev_dt_str)
+                    time_diff = dt - previous_dt
+                    if time_diff.total_seconds() < 3600:
+                        previous_dt_str = prev_dt_str
+                        break
+
+            if previous_dt_str:
+                previous_dt = datetime.fromisoformat(previous_dt_str)
+                previous_toll = self.get_toll_fee(previous_dt, self.vehicle)
+                if previous_toll > toll:
+                    toll = previous_toll
+
+            # Add the toll to the corresponding date in the dictionary
+            tax_by_date[date] += toll
+
+
+            # Cap the total tax at 60
+            if tax_by_date[date] > 60:
+                tax_by_date[date] = 60
+
+        # Calculate the total tax by summing the taxes for each date
+        total_tax = sum(tax_by_date.values())
+
+
+        return total_tax

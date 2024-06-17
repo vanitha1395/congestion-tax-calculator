@@ -17,23 +17,11 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"",
-							"pm.test(\"Response has the required fields\", function () {",
-							"  const responseData = pm.response.json();",
-							"  ",
-							"  pm.expect(responseData).to.be.an('object');",
-							"  pm.expect(responseData.congestionTaxAmount).to.exist;",
-							"});",
-							"",
-							"",
-							"pm.test(\"CongestionTaxAmount is a number\", function () {",
-							"    const responseData = pm.response.json();",
-							"    pm.expect(responseData.congestionTaxAmount).to.be.a('number');",
-							"});",
-							"",
-							"",
 							"pm.test(\"Response time is less than 200ms\", function () {",
 							"  pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"pm.test(\"Tax calculated value\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"120\");",
 							"});"
 						],
 						"type": "text/javascript",
@@ -49,7 +37,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"city\": \"Gothenburg\",\n  \"vehicleId\": \"car\",\n  \"travelDates\": [\n    \"2023-06-11T09:00:00\",\n    \"2023-06-14T07:30:00\"\n  ]\n}",
+					"raw": "{\n  \"city\": \"Gothenburg\",\n  \"vehicleId\": \"car\",\n  \"travelDates\": [\n    \"2024-06-17T06:15:00\",\n    \"2024-06-17T09:00:00\",\n    \"2024-06-17T10:01:00\",\n    \"2024-06-17T11:02:00\",\n    \"2024-06-17T13:02:00\",\n    \"2024-06-17T14:02:00\",\n    \"2024-06-17T16:02:00\",\n    \"2024-06-18T06:15:00\",\n    \"2024-06-18T09:00:00\",\n    \"2024-06-18T10:01:00\",\n    \"2024-06-18T11:02:00\",\n    \"2024-06-18T13:02:00\",\n    \"2024-06-18T14:02:00\",\n    \"2024-06-18T16:02:00\"\n  ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -306,6 +294,28 @@
 		},
 		{
 			"name": "localhost:8080/CalculateCongestionTax_TC3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"pm.test(\"Tax value expected\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"144\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},

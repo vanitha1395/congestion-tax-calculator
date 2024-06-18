@@ -37,6 +37,9 @@ Have used Postman webclient with desktop application to run tests against the co
 
 
 ## Enhancements and Improvements
+- Registering the IP/Port using configuration file
+- Integration of python lint
+- Automation of test cases using Postman
 - Ability to find vehicle-type from vehicle registration number
 - Invalid input handling (throwing error or negative response when invalid input provided)
 - Handle vehicle and city object creation instances in a better manner

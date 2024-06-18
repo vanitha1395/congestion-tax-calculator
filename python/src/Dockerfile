@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8080
 
 # Set the command to run the app
-CMD ["python", "http_request_handler.py"]
+CMD ["python", "main.py"]

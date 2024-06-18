@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, timedelta
 from enum import Enum
 from collections import defaultdict
 
@@ -113,49 +113,40 @@ class CongestionCalculator:
     #     return total_fee
 
     def get_tax_with_date(self, datetime_str_list: list):
-        # Create a dictionary to store the tax for each date
-        tax_by_date = defaultdict(int)
-        interval_date = datetime_str_list[0]
 
-        # Iterate over the datetime list
+        # Create a dictionary to store the toll for each date
+        toll_by_date = defaultdict(int)
+
+        # Create a dictionary to store the last charged time for each date
+        last_charged_time = {}
+
+        # Iterate over the datetime string list
         for dt_str in datetime_str_list:
-
             # Convert the string to a datetime object
             dt = datetime.fromisoformat(dt_str)
-            interval_dt = datetime.fromisoformat(interval_date)
 
             # Get the date from the datetime object
-            date = dt.strftime('%Y-%m-%d')
+            date = dt.date()
 
             # Calculate the toll for the current datetime
             toll = self.get_toll_fee(dt_str, self.vehicle)
 
-            # Check if there's a previous datetime within one hour
-            previous_dt_str = None
-            for prev_dt_str in datetime_str_list:
-                if prev_dt_str < dt_str:
-                    previous_dt = datetime.fromisoformat(prev_dt_str)
-                    time_diff = dt - previous_dt
-                    if time_diff.total_seconds() < 3600:
-                        previous_dt_str = prev_dt_str
-                        break
-
-            if previous_dt_str:
-                previous_dt = datetime.fromisoformat(previous_dt_str)
-                previous_toll = self.get_toll_fee(previous_dt, self.vehicle)
-                if previous_toll > toll:
-                    toll = previous_toll
+            # Check if the current datetime is within 60 minutes of the last charged time for the same date
+            if date in last_charged_time:
+                last_charged_dt = last_charged_time[date]
+                time_diff = dt - last_charged_dt
+                if time_diff < timedelta(hours=1):
+                    continue  # Skip this datetime as it falls within the 60-minute window
 
             # Add the toll to the corresponding date in the dictionary
-            tax_by_date[date] += toll
+            toll_by_date[date] += toll
 
+            # Update the last charged time for the current date
+            last_charged_time[date] = dt
 
-            # Cap the total tax at 60
-            if tax_by_date[date] > 60:
-                tax_by_date[date] = 60
+        # Cap the total toll at 60 per day
+        for date, toll in toll_by_date.items():
+            if toll > 60:
+                toll_by_date[date] = 60
 
-        # Calculate the total tax by summing the taxes for each date
-        total_tax = sum(tax_by_date.values())
-
-
-        return total_tax
+        return sum(toll_by_date.values())

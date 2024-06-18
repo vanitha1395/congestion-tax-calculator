@@ -1,5 +1,5 @@
 from datetime import datetime, time
-
+## List of toll free vehicles
 toll_free_vehicles = [
     "emergency_vehicles",
     "bus",
@@ -9,7 +9,7 @@ toll_free_vehicles = [
     "foreign_vehicles"
 ]
 
-##
+## Gothenburg city toll charge schedule
 gothenburg_toll_fee_schedule = [
     (time(6, 0), time(6, 29), 8),
     (time(6, 30), time(6, 59), 13),
@@ -19,5 +19,5 @@ gothenburg_toll_fee_schedule = [
     (time(15, 00), time(15, 29), 13),
     (time(15, 30), time(16, 59), 18),
     (time(17, 00), time(17, 59), 13),
-    (time(18, 00), time(18, 29), 8),
+    (time(18, 00), time(18, 29), 8)
 ]

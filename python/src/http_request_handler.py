@@ -3,7 +3,10 @@ import json
 import http.server
 from congestion_tax_calculator import CongestionCalculator
 
-
+"""
+This class inherits HttpRequestHandler to provide an end-point
+CalculateCongestionTax
+"""
 class TaxCalculatorAPIHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/CalculateCongestionTax":
@@ -32,15 +35,12 @@ class TaxCalculatorAPIHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404, "End point found")
 
-# function to instantiate the server with a http-server serving endpoint
-
+"""
+function to instantiate the server with a http-server serving endpoint
+"""
 def instantiate_server(server_class=HTTPServer, handler_class=TaxCalculatorAPIHandler, port=8080):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f"Starting server on port {port}....")
 
     httpd.serve_forever()
-
-
-if __name__ == "__main__":
-    instantiate_server()

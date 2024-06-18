@@ -43,6 +43,9 @@ class CongestionCalculator:
         }
         return vehicle_types[vehicle_type]
 
+    """
+    Calculates toll for respective vehicle and time based on the city
+    """
     def get_toll_fee(self, date: datetime, vehicle: Vehicle) -> int:
         if self.is_toll_free_date(date) or self.is_toll_free_vehicle(vehicle):
             return 0
@@ -57,6 +60,9 @@ class CongestionCalculator:
 
         return 0
 
+    """
+    Identify if toll free vehicles using this method
+    """
     def is_toll_free_vehicle(self, vehicle: Vehicle) -> bool:
 
         # vehicle name present in toll free vehicle list
@@ -71,6 +77,7 @@ class CongestionCalculator:
         vehicle_type = vehicle.get_vehicle_type(vehicle)
         return vehicle_type == TollFreeVehicles.MOTORCYCLE.name.capitalize() or vehicle_type == TollFreeVehicles.TRACTOR.name.capitalize() or vehicle_type == TollFreeVehicles.EMERGENCY.name.capitalize() or vehicle_type == TollFreeVehicles.DIPLOMAT.name.capitalize() or vehicle_type == TollFreeVehicles.FOREIGN.name.capitalize() or vehicle_type == TollFreeVehicles.MILITARY.name.capitalize()
 
+
     def is_toll_free_date(self, date: datetime):
         date_obj = datetime.fromisoformat(date)
         year = date_obj.year
@@ -80,7 +87,7 @@ class CongestionCalculator:
         if date_obj.weekday() == 5 or date_obj.weekday() == 6:
             return True
 
-        if year == 2013:
+        if year == 2023:
             if month == 1 and day == 1 or month == 3 and (day == 28 or day == 29) or month == 4 and (day == 1 or day == 30) or month == 5 and (day == 1 or day == 8 or day == 9) or month == 6 and (day == 5 or day == 6 or day == 21) or month == 7 or month == 11 and day == 1 or month == 12 and (day == 24 or day == 25 or day == 26 or day == 31):
                 return True
 

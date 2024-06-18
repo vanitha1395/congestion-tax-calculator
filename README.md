@@ -33,7 +33,7 @@ Have used Postman webclient with desktop application to run tests against the co
 
 ## Known limitations
 - only available city, gothenburg, can be extended for other cities.
-- Configurations can be kept in database
+- The calculator doesn't choose the highest value of toll while driving within 60mins.
 
 
 ## Enhancements and Improvements

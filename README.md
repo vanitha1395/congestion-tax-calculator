@@ -3,6 +3,11 @@
 This project focuses on calculating the congestion taxes for vehicles.
 This applicaiton is built using python, and provides an HTTP endpoint to calculate congesstion tax vehicle based on json input. 
 
+# Java implementation overview
+Please find the details in the readme.md in `java` folder. 
+
+
+# Python implementation overview
 ## Tools and plugins used
 Python3.9 - Application development
 Docker - Deployment
